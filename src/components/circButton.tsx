@@ -33,4 +33,4 @@ const CircButton = ({text,buttonSize = 100, textSize = 64, onPress} : CircButton
     );
 };
 
-export default CircButton;
+export {CircButton};
