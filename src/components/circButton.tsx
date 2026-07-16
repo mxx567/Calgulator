@@ -1,4 +1,3 @@
-import React from "react"
 import {Text, StyleSheet, Pressable} from "react-native"
 
 
@@ -6,15 +5,16 @@ interface CircButtonProps{
     text?: string,
     buttonSize?: number,
     textSize?: number,
+    color?: string,
     onPress() : void,
 };
 
-const CircButton = ({text,buttonSize = 100, textSize = 64, onPress} : CircButtonProps) =>{
+const CircButton = ({text,buttonSize = 100, textSize = 64, onPress, color} : CircButtonProps) =>{
     const CircStyle = StyleSheet.create({
         button :{
             width: buttonSize,
             height: buttonSize,
-            backgroundColor: 'grey',
+            backgroundColor: color? color : 'grey',
             borderRadius: '100%',
             alignItems: 'center',
             justifyContent: 'center'
@@ -24,8 +24,6 @@ const CircButton = ({text,buttonSize = 100, textSize = 64, onPress} : CircButton
             color: 'white'
         }
     });
-
-    
     return(
         <Pressable style = {CircStyle.button} onPress={onPress}>
             <Text style = {CircStyle.text}>{text}</Text>

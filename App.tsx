@@ -1,5 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, StatusBar } from 'react-native';
 import { CircButton } from './src/components/circButton';
 import { useState } from 'react';
 
@@ -26,6 +25,17 @@ function isOperator(symb : string){
   return operators.includes(symb);
 
 }
+
+const getFontSize = (text: string) => {
+    const maxSize = 40;
+    const minSize = 10;
+    const maxChars = 12;
+
+    return Math.max(
+        minSize,
+        maxSize * Math.min(1, maxChars / text.length)
+    );
+};
 
 
 const checkSyntax = (exp : string, symb : ButtonDesc) =>{
@@ -72,7 +82,45 @@ function calculate(exp : string){
 
 export default function App() {
   const [exp, setExp] = useState('');
-
+  const fontsizerel = getFontSize(exp);
+  const styles = StyleSheet.create({
+    container: {
+      flex:1,
+      backgroundColor: '#2B2B2B',
+      alignItems: 'center',
+      justifyContent: 'space-evenly', 
+    },
+    buttonsView:{
+      flex:20,
+      alignItems: 'center',
+      gap:15
+    },
+    buttonsRow:{
+      
+      flexDirection:'row',
+      gap:15
+    },
+    topMenu:{
+      flex:1,
+      width:310,
+      marginTop: 35,
+      marginRight:20,
+      marginLeft:20,
+      height:60,
+      backgroundColor:'#212121',
+      borderRadius: 100,
+    },
+    text:{
+      flex:2,
+      alignSelf:'flex-end',
+      marginRight:20,
+      marginLeft:20,
+      marginTop:190,
+      marginBottom: 20,
+      color: 'white',
+      fontSize: fontsizerel,
+    }
+  });
   const handleButtonPress = (button: ButtonDesc, prev : string) => {
     try{
       switch (button.type) {
@@ -100,34 +148,29 @@ export default function App() {
 };
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
-      <Text>{exp}</Text>
-      {
-        buttons.map((buttrow : ButtonDesc[], key: number) => 
-          <View style = {styles.buttonsRow} key = {key}>
-            {
-              buttrow.map((butt: ButtonDesc, key: number) => <CircButton text={butt.text} key={key} textSize={30} buttonSize={70} onPress={() => handleButtonPress(butt, exp)}/>)
-            }
-          </View> 
-        )
-      }
+      <StatusBar translucent backgroundColor="transparent"/>
+
+      <View style= {styles.topMenu}>
+
+      </View>
+
+      <Text style= {styles.text}>{exp}</Text>
+      <View style={styles.buttonsView}>
+        {
+          buttons.map((buttrow : ButtonDesc[], key: number) => 
+            <View style = {styles.buttonsRow} key = {key}>
+              {
+                buttrow.map((butt: ButtonDesc, key: number) => <CircButton text={butt.text} key={key} textSize={30} buttonSize={70} color = {'#212121'} onPress={() => handleButtonPress(butt, exp)}/>)
+              }
+            </View> 
+          )
+        }
+      </View>
+      
       
     </View>
   );
+  
 }
 
 
-
-const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'space-evenly', 
-    marginTop: 270,
-  },
-  buttonsRow:{
-    flexDirection:'row',
-    gap:15
-  }
-});
