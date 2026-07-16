@@ -3,66 +3,92 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CircButton } from './src/components/circButton';
 import { useState } from 'react';
 
-const buttons:string[][] = [
-    ['AC', 'DEL','%'],
-    ['7', '8', '9', '/'],
-    ['4', '5', '6', '*'],
-    ['1', '2', '3', '-'],
-    ['.', '0', '=', '+']
+interface ButtonDesc{
+  text: string,
+  type:
+        | "number"
+        | "operator"
+        | "clear"
+        | "delete"
+        | "equals"
+}
+
+const buttons:ButtonDesc[][] = [
+    [{text: 'AC', type: 'clear'}, {text: 'DEL', type: 'delete'}, {text: '%', type: 'operator'}],
+    [{text: '7', type: 'number'},{text: '8', type: 'number'},{text: '9', type: 'number'}, {text: '/', type: 'operator'}],
+    [{text: '4', type: 'number'},{text: '5', type: 'number'},{text: '6', type: 'number'}, {text: '*', type: 'operator'}],
+    [{text: '1', type: 'number'},{text: '2', type: 'number'},{text: '3', type: 'number'}, {text: '-', type: 'operator'}],
+    [{text: '.', type: 'operator'},{text: '0', type: 'number'}, {text: '=', type: 'equals'}, {text: '+', type: 'operator'}]
 ];
 
 
-function isIn(arr : any[], elem : any){
-  for(let i = 0; i < arr.length; i++){
-    if(arr[i] == elem){
-      return true;
-    }
-  }
-  return false;
-}
 
-const checkSyntax = (exp : string, symb : string) =>{
+
+const checkSyntax = (exp : string, symb : ButtonDesc) =>{
   const operators:string[] = ['/','*','-','+'];
-  var symbIsNotNum = isIn(operators, symb)
+  var symbIsNotNum = (symb.type == 'operator')? true : false;
   if(exp.length == 0 && symbIsNotNum){
     return exp;
   }
-
-  if(isIn(operators, exp.charAt(exp.length-1)) && symbIsNotNum){
-    exp = exp.slice(0,exp.length-1) + symb;
-    console.log(exp)
+  if(operators.includes(exp.charAt(exp.length-1)) && symbIsNotNum){
+    exp = exp.slice(0,exp.length-1) + symb.text;
     return (exp);
   }
-
-  if (symb === '.') {
-        const parts = exp.split(/[+\-*/]/);
-        const currentNumber = parts[parts.length - 1];
-
-        if (currentNumber.includes('.')) {
-            return exp;
-        }
-
-        if (currentNumber === '' || operators.includes(exp.charAt(exp.length - 1))) {
-            return exp + '0.';
-        }
+  const parts = exp.split(/[+\-*/]/);
+  const currentNumber = parts[parts.length - 1];
+  if(symb.text === '.'){
+    if (currentNumber.includes('.')) {
+      return exp;
     }
-  return(exp + symb);
+
+    if (currentNumber === '' || operators.includes(exp.charAt(exp.length - 1))) {
+      return exp + '0.';
+    }
+  }
+  if(symb.text === '%'){
+    return exp.slice(0, exp.lastIndexOf(currentNumber)) + String(Number(currentNumber) / 100);
+  }
+  return(exp + symb.text);
 }
+
+
+
+
 
 
 
 export default function App() {
   const [exp, setExp] = useState('');
 
+  const handleButtonPress = (button: ButtonDesc, prev : string) => {
+    switch (button.type) {
+        case "clear":
+            setExp("");
+            break;
+
+        case "delete":
+            setExp(prev => prev.slice(0, -1));
+            break;
+
+        case "equals":
+            setExp(String(eval(prev)));
+            break;
+
+        case "number":
+        case "operator":
+            setExp(prev => checkSyntax(prev, button));
+            break;
+    }
+};
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Text>{exp}</Text>
       {
-        buttons.map((buttrow : string[], key: number) => 
+        buttons.map((buttrow : ButtonDesc[], key: number) => 
           <View style = {styles.buttonsRow} key = {key}>
             {
-              buttrow.map((butt: string, key: number) => <CircButton text={butt} key={key} textSize={30} buttonSize={70} onPress={() => {butt != '=' ? setExp(checkSyntax(exp, butt)) : setExp(exp? String(eval(exp)) : exp)}}/>)
+              buttrow.map((butt: ButtonDesc, key: number) => <CircButton text={butt.text} key={key} textSize={30} buttonSize={70} onPress={() => handleButtonPress(butt, exp)}/>)
             }
           </View> 
         )
