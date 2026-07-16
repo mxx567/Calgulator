@@ -13,11 +13,11 @@ interface ButtonDesc{
 }
 
 const buttons:ButtonDesc[][] = [
-    [{text: 'AC', type: 'clear'}, {text: 'DEL', type: 'delete'}, {text: '%', type: 'operator'}],
-    [{text: '7', type: 'number'},{text: '8', type: 'number'},{text: '9', type: 'number'}, {text: '/', type: 'operator'}],
-    [{text: '4', type: 'number'},{text: '5', type: 'number'},{text: '6', type: 'number'}, {text: '*', type: 'operator'}],
-    [{text: '1', type: 'number'},{text: '2', type: 'number'},{text: '3', type: 'number'}, {text: '-', type: 'operator'}],
-    [{text: '.', type: 'operator'},{text: '0', type: 'number'}, {text: '=', type: 'equals'}, {text: '+', type: 'operator'}]
+  [{text: 'AC', type: 'clear'}, {text: 'DEL', type: 'delete'}, {text: '%', type: 'operator'}, {text: '√', type: 'operator'}],
+  [{text: '7', type: 'number'},{text: '8', type: 'number'},{text: '9', type: 'number'}, {text: '/', type: 'operator'}],
+  [{text: '4', type: 'number'},{text: '5', type: 'number'},{text: '6', type: 'number'}, {text: '*', type: 'operator'}],
+  [{text: '1', type: 'number'},{text: '2', type: 'number'},{text: '3', type: 'number'}, {text: '-', type: 'operator'}],
+  [{text: '.', type: 'operator'},{text: '0', type: 'number'}, {text: '=', type: 'equals'}, {text: '+', type: 'operator'}]
 ];
 
 function isOperator(symb : string){
@@ -65,7 +65,12 @@ const checkSyntax = (exp : string, symb : ButtonDesc) =>{
     }
     return exp.slice(0, exp.lastIndexOf(currentNumber)) + String(Number(currentNumber) / 100);
   }
+  if(symb.text === "√"){
+    return exp.slice(0, exp.lastIndexOf(currentNumber)) + String(Number(currentNumber) ** 0.5);
+  }
   return(exp + symb.text);
+
+
 }
 
 
@@ -73,9 +78,10 @@ function calculate(exp : string){
   if(isOperator(exp.charAt(exp.length-1))){
     return String(eval(exp.slice(0, exp.length-1)));
   }
-  else{
-    return String(eval(exp));
+  if(exp.length == 0){
+    return exp;
   }
+  return String(eval(exp));
 }
 
 
@@ -91,27 +97,26 @@ export default function App() {
       justifyContent: 'space-evenly', 
     },
     buttonsView:{
-      flex:20,
+      flex:10,
       alignItems: 'center',
       gap:15
     },
     buttonsRow:{
-      
+
       flexDirection:'row',
       gap:15
     },
     topMenu:{
-      flex:1,
+      flex:1.5,
       width:310,
       marginTop: 35,
       marginRight:20,
       marginLeft:20,
-      height:60,
       backgroundColor:'#212121',
       borderRadius: 100,
     },
     text:{
-      flex:2,
+      flex:1.2,
       alignSelf:'flex-end',
       marginRight:20,
       marginLeft:20,
