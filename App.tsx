@@ -21,16 +21,20 @@ const buttons:ButtonDesc[][] = [
     [{text: '.', type: 'operator'},{text: '0', type: 'number'}, {text: '=', type: 'equals'}, {text: '+', type: 'operator'}]
 ];
 
+function isOperator(symb : string){
+  const operators:string[] = ['/','*','-','+'];
+  return operators.includes(symb);
 
+}
 
 
 const checkSyntax = (exp : string, symb : ButtonDesc) =>{
-  const operators:string[] = ['/','*','-','+'];
+  
   var symbIsNotNum = (symb.type == 'operator')? true : false;
   if(exp.length == 0 && symbIsNotNum){
     return exp;
   }
-  if(operators.includes(exp.charAt(exp.length-1)) && symbIsNotNum){
+  if(isOperator(exp.charAt(exp.length-1)) && symbIsNotNum){
     exp = exp.slice(0,exp.length-1) + symb.text;
     return (exp);
   }
@@ -41,19 +45,28 @@ const checkSyntax = (exp : string, symb : ButtonDesc) =>{
       return exp;
     }
 
-    if (currentNumber === '' || operators.includes(exp.charAt(exp.length - 1))) {
+    if (currentNumber === '' || isOperator(exp.charAt(exp.length-1))) {
       return exp + '0.';
     }
   }
   if(symb.text === '%'){
+    if(exp.includes('e')){
+      return(exp);
+    }
     return exp.slice(0, exp.lastIndexOf(currentNumber)) + String(Number(currentNumber) / 100);
   }
   return(exp + symb.text);
 }
 
 
-
-
+function calculate(exp : string){
+  if(isOperator(exp.charAt(exp.length-1))){
+    return String(eval(exp.slice(0, exp.length-1)));
+  }
+  else{
+    return String(eval(exp));
+  }
+}
 
 
 
@@ -61,7 +74,8 @@ export default function App() {
   const [exp, setExp] = useState('');
 
   const handleButtonPress = (button: ButtonDesc, prev : string) => {
-    switch (button.type) {
+    try{
+      switch (button.type) {
         case "clear":
             setExp("");
             break;
@@ -71,13 +85,17 @@ export default function App() {
             break;
 
         case "equals":
-            setExp(String(eval(prev)));
+            setExp(calculate(exp));
             break;
 
         case "number":
         case "operator":
             setExp(prev => checkSyntax(prev, button));
             break;
+        }
+    }
+    catch (e){
+      setExp('Error has occured')
     }
 };
   return (
