@@ -1,16 +1,8 @@
 import { StyleSheet, Text, View, StatusBar } from 'react-native';
 import { CircButton } from './src/components/circButton';
 import { useState } from 'react';
-
-interface ButtonDesc{
-  text: string,
-  type:
-        | "number"
-        | "operator"
-        | "clear"
-        | "delete"
-        | "equals"
-}
+import ButtonDesc from './src/types/buttonRender';
+import { isOperator,getFontSize,checkSyntax, calculate } from './src/utils/calculator';
 
 const buttons:ButtonDesc[][] = [
   [{text: 'AC', type: 'clear'}, {text: 'DEL', type: 'delete'}, {text: '%', type: 'operator'}, {text: '√', type: 'operator'}],
@@ -20,69 +12,6 @@ const buttons:ButtonDesc[][] = [
   [{text: '.', type: 'operator'},{text: '0', type: 'number'}, {text: '=', type: 'equals'}, {text: '+', type: 'operator'}]
 ];
 
-function isOperator(symb : string){
-  const operators:string[] = ['/','*','-','+'];
-  return operators.includes(symb);
-
-}
-
-const getFontSize = (text: string) => {
-    const maxSize = 40;
-    const minSize = 10;
-    const maxChars = 12;
-
-    return Math.max(
-        minSize,
-        maxSize * Math.min(1, maxChars / text.length)
-    );
-};
-
-
-const checkSyntax = (exp : string, symb : ButtonDesc) =>{
-  
-  var symbIsNotNum = (symb.type == 'operator')? true : false;
-  if(exp.length == 0 && symbIsNotNum){
-    return exp;
-  }
-  if(isOperator(exp.charAt(exp.length-1)) && symbIsNotNum){
-    exp = exp.slice(0,exp.length-1) + symb.text;
-    return (exp);
-  }
-  const parts = exp.split(/[+\-*/]/);
-  const currentNumber = parts[parts.length - 1];
-  if(symb.text === '.'){
-    if (currentNumber.includes('.')) {
-      return exp;
-    }
-
-    if (currentNumber === '' || isOperator(exp.charAt(exp.length-1))) {
-      return exp + '0.';
-    }
-  }
-  if(symb.text === '%'){
-    if(exp.includes('e')){
-      return(exp);
-    }
-    return exp.slice(0, exp.lastIndexOf(currentNumber)) + String(Number(currentNumber) / 100);
-  }
-  if(symb.text === "√"){
-    return exp.slice(0, exp.lastIndexOf(currentNumber)) + String(Number(currentNumber) ** 0.5);
-  }
-  return(exp + symb.text);
-
-
-}
-
-
-function calculate(exp : string){
-  if(isOperator(exp.charAt(exp.length-1))){
-    return String(eval(exp.slice(0, exp.length-1)));
-  }
-  if(exp.length == 0){
-    return exp;
-  }
-  return String(eval(exp));
-}
 
 
 
